@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrganizaJá - Gerenciador de Tarefas</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>OrganizaJá</h1>
+        <p>Gerenciador de Tarefas</p>
+
+        <nav>
+            <ul>
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#cadastro">Cadastrar tarefa</a></li>
+                <li><a href="#tarefas">Minhas tarefas</a></li>
+                <li><a href="#detalhes">Detalhes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <section id="inicio">
+            <h2>Organize suas tarefas</h2>
+            <p>
+                Gerencie suas tarefas de forma simples, organizada e eficiente.
+            </p>
+        </section>
+
+        <section id="cadastro">
+            <h2>Cadastrar nova tarefa</h2>
+
+            <form>
+
+                <div>
+                    <label for="identificador">Identificador:</label>
+                    <input type="number" id="identificador" name="identificador">
+                </div>
+
+                <div>
+                    <label for="nome">Nome da tarefa:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+
+                <div>
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" name="descricao" rows="4"></textarea>
+                </div>
+
+                <div>
+                    <label for="categoria">Categoria:</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">Selecione uma categoria</option>
+                        <option value="estudos">Estudos</option>
+                        <option value="trabalho">Trabalho</option>
+                        <option value="pessoal">Pessoal</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="dataConclusao">Data de conclusão:</label>
+                    <input type="date" id="dataConclusao" name="dataConclusao">
+                </div>
+
+                <div>
+                    <label for="status">Status:</label>
+                    <select id="status" name="status">
+                        <option value="">Selecione o status</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="andamento">Em andamento</option>
+                        <option value="concluida">Concluída</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="importancia">Nível de importância:</label>
+                    <select id="importancia" name="importancia">
+                        <option value="">Selecione a importância</option>
+                        <option value="baixa">Baixa</option>
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+
+                <button type="submit">Cadastrar tarefa</button>
+
+            </form>
+        </section>
+
+        <section id="tarefas">
+            <h2>Minhas tarefas</h2>
+
+            <div>
+                <label for="pesquisa">Pesquisar tarefa:</label>
+                <input type="search" id="pesquisa" name="pesquisa" placeholder="Digite o nome da tarefa">
+            </div>
+
+            <div>
+                <label for="filtroCategoria">Filtrar por categoria:</label>
+                <select id="filtroCategoria" name="filtroCategoria">
+                    <option value="">Todas as categorias</option>
+                    <option value="estudos">Estudos</option>
+                    <option value="trabalho">Trabalho</option>
+                    <option value="pessoal">Pessoal</option>
+                    <option value="outros">Outros</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="ordenacao">Ordenar por:</label>
+                <select id="ordenacao" name="ordenacao">
+                    <option value="">Selecione</option>
+                    <option value="nome">Nome</option>
+                    <option value="data">Data de conclusão</option>
+                    <option value="importancia">Nível de importância</option>
+                    <option value="status">Status</option>
+                </select>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Identificador</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Data de conclusão</th>
+                        <th>Status</th>
+                        <th>Importância</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Estudar HTML</td>
+                        <td>Estudos</td>
+                        <td>05/10/2026</td>
+                        <td>Pendente</td>
+                        <td>Alta</td>
+                        <td>
+                            <button type="button">Ver detalhes</button>
+                            <button type="button">Editar</button>
+                            <button type="button">Excluir</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Fazer trabalho da faculdade</td>
+                        <td>Estudos</td>
+                        <td>10/10/2026</td>
+                        <td>Em andamento</td>
+                        <td>Alta</td>
+                        <td>
+                            <button type="button">Ver detalhes</button>
+                            <button type="button">Editar</button>
+                            <button type="button">Excluir</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>Organizar documentos</td>
+                        <td>Pessoal</td>
+                        <td>15/10/2026</td>
+                        <td>Concluída</td>
+                        <td>Média</td>
+                        <td>
+                            <button type="button">Ver detalhes</button>
+                            <button type="button">Editar</button>
+                            <button type="button">Excluir</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="detalhes">
+            <h2>Detalhes da tarefa</h2>
+
+            <article>
+                <h3>Estudar HTML</h3>
+
+                <p><strong>Identificador:</strong> 1</p>
+                <p><strong>Descrição:</strong> Estudar os principais elementos HTML e sua utilização.</p>
+                <p><strong>Categoria:</strong> Estudos</p>
+                <p><strong>Data de conclusão:</strong> 05/10/2026</p>
+                <p><strong>Status:</strong> Pendente</p>
+                <p><strong>Nível de importância:</strong> Alta</p>
+
+                <button type="button">Editar tarefa</button>
+                <button type="button">Excluir tarefa</button>
+            </article>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 OrganizaJá - Gerenciador de Tarefas</p>
+    </footer>
+
+</body>
+</html>
