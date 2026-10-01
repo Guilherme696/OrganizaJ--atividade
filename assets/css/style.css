@@ -236,4 +236,15 @@ footer {
         overflow-x: auto;
         white-space: nowrap;
     }
+    fieldset {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 25px;
+}
+
+legend {
+    padding: 0 10px;
+    font-weight: bold;
+    color: #1f2937;
+}
 }
