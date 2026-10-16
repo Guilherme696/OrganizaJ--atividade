@@ -1,10 +1,10 @@
 
-/* ==============================
-   ORGANIZAJÁ - ESTILIZAÇÃO
-   Etapa 2: CSS, Layout e Responsividade
-   ============================== */
+/* =========================================
+   ORGANIZAJÁ - CSS COMPLETO
+   Etapa 2 - Estilização e Responsividade
+   ========================================= */
 
-/* Reset e configurações gerais */
+/* 1. Configurações gerais */
 * {
     margin: 0;
     padding: 0;
@@ -23,7 +23,7 @@ body {
     font-size: 16px;
 }
 
-/* Cabeçalho */
+/* 2. Cabeçalho */
 header {
     background: linear-gradient(135deg, #172554, #1d4ed8);
     color: #ffffff;
@@ -41,7 +41,7 @@ header p {
     margin-bottom: 20px;
 }
 
-/* Navegação */
+/* 3. Menu de navegação */
 nav ul {
     list-style: none;
     display: flex;
@@ -55,7 +55,7 @@ nav a {
     text-decoration: none;
     font-weight: bold;
     padding: 5px 0;
-    transition: color 0.2s, opacity 0.2s;
+    transition: color 0.2s;
 }
 
 nav a:hover {
@@ -67,16 +67,16 @@ nav a:hover {
 nav a:focus-visible {
     outline: 3px solid #bfdbfe;
     outline-offset: 4px;
-    border-radius: 3px;
 }
 
-/* Área principal e cartões */
+/* 4. Área principal */
 main {
     width: 90%;
     max-width: 1200px;
     margin: 30px auto;
 }
 
+/* 5. Seções */
 section {
     background-color: #ffffff;
     margin-bottom: 30px;
@@ -93,7 +93,7 @@ section h2 {
     line-height: 1.3;
 }
 
-/* Formulário */
+/* 6. Formulário */
 form {
     display: flex;
     flex-direction: column;
@@ -133,6 +133,7 @@ label {
     color: #334155;
 }
 
+/* 7. Campos de entrada */
 input,
 select,
 textarea {
@@ -162,7 +163,7 @@ textarea {
     min-height: 110px;
 }
 
-/* Botões */
+/* 8. Botões gerais */
 button {
     border: none;
     padding: 11px 18px;
@@ -193,20 +194,27 @@ fieldset > button {
     justify-self: start;
 }
 
-/* Pesquisa, filtro e ordenação */
+/* 9. Pesquisa, filtros e ordenação */
 #tarefas > div {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
 }
 
 #tarefas > div label {
     font-size: 14px;
+    font-weight: bold;
     color: #334155;
 }
 
-/* Tabela de tarefas */
+#tarefas > div input,
+#tarefas > div select {
+    width: 100%;
+    min-width: 0;
+}
+
+/* 10. Tabela de tarefas */
 #tarefas table {
     width: 100%;
     border-collapse: separate;
@@ -225,7 +233,7 @@ fieldset > button {
 
 #tarefas th,
 #tarefas td {
-    padding: 13px 12px;
+    padding: 14px 12px;
     border-bottom: 1px solid #e2e8f0;
     text-align: left;
     vertical-align: middle;
@@ -243,11 +251,18 @@ fieldset > button {
     border-bottom: none;
 }
 
-#tarefas td button {
-    margin: 3px;
-    white-space: nowrap;
+/* 11. Botões de ação da tabela */
+
+/* Ver detalhes - azul */
+#tarefas td button:first-child {
+    background-color: #2563eb;
 }
 
+#tarefas td button:first-child:hover {
+    background-color: #1d4ed8;
+}
+
+/* Editar - laranja */
 #tarefas td button:nth-child(2) {
     background-color: #d97706;
 }
@@ -256,6 +271,7 @@ fieldset > button {
     background-color: #b45309;
 }
 
+/* Excluir - vermelho */
 #tarefas td button:nth-child(3) {
     background-color: #dc2626;
 }
@@ -264,9 +280,14 @@ fieldset > button {
     background-color: #b91c1c;
 }
 
-/* Detalhes da tarefa */
+#tarefas td button {
+    margin: 3px;
+    white-space: nowrap;
+}
+
+/* 12. Detalhes da tarefa */
 article {
-    border: 1px solid #d1d5db;
+    border: 1px solid #dbe3ef;
     border-radius: 10px;
     padding: 25px;
     background-color: #f8fafc;
@@ -288,6 +309,7 @@ article button {
     margin-right: 8px;
 }
 
+/* Botão excluir nos detalhes */
 article button:last-child {
     background-color: #dc2626;
 }
@@ -296,7 +318,7 @@ article button:last-child:hover {
     background-color: #b91c1c;
 }
 
-/* Rodapé */
+/* 13. Rodapé */
 footer {
     background-color: #172554;
     color: #ffffff;
@@ -305,17 +327,16 @@ footer {
     margin-top: 40px;
 }
 
-/* Telas maiores: alinhar controles */
+/* 14. Telas grandes: alinhar filtros com CSS Grid */
 @media (min-width: 900px) {
     #tarefas > div {
-        display: grid;
         grid-template-columns: 190px minmax(0, 1fr);
         align-items: center;
         gap: 14px;
     }
 }
 
-/* Tablets */
+/* 15. Tablets */
 @media (max-width: 768px) {
     header {
         padding: 24px 5%;
@@ -351,7 +372,7 @@ footer {
     }
 }
 
-/* Celulares */
+/* 16. Celulares */
 @media (max-width: 650px) {
     header h1 {
         font-size: 28px;
@@ -376,12 +397,12 @@ footer {
         padding: 16px;
     }
 
-    fieldset > div:nth-of-type(3),
-    fieldset > button {
+    fieldset > div:nth-of-type(3) {
         grid-column: auto;
     }
 
     fieldset > button {
+        grid-column: auto;
         width: 100%;
     }
 
