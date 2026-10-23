@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,9 +7,8 @@
     <title>OrganizaJá - Gerenciador de Tarefas</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-        
-<body>
 
+<body>
     <header>
         <h1>OrganizaJá</h1>
         <p>Gerenciador de Tarefas</p>
@@ -24,7 +24,6 @@
     </header>
 
     <main>
-
         <section id="inicio">
             <h2>Organize suas tarefas</h2>
             <p>
@@ -35,64 +34,85 @@
         <section id="cadastro">
             <h2>Cadastrar nova tarefa</h2>
 
-        <form>
-            <fieldset>
-                <legend>Informações da tarefa</legend>
+            <form>
+                <fieldset>
+                    <legend>Informações da tarefa</legend>
 
-            <div>
-                <label for="identificador">Identificador:</label>
-                <input type="number" id="identificador" name="identificador">
-            </div>
+                    <div>
+                        <label for="identificador">Identificador:</label>
+                        <input
+                            type="number"
+                            id="identificador"
+                            name="identificador"
+                            disabled
+                            placeholder="Gerado automaticamente"
+                        >
+                    </div>
 
-            <div>
-                <label for="nome">Nome da tarefa:</label>
-                <input type="text" id="nome" name="nome" required>
-            </div>
+                    <div>
+                        <label for="nome">Nome da tarefa:</label>
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            required
+                            maxlength="100"
+                        >
+                    </div>
 
-            <div>
-                <label for="descricao">Descrição:</label>
-                <textarea id="descricao" name="descricao" rows="4"></textarea>
-            </div>
+                    <div>
+                        <label for="descricao">Descrição:</label>
+                        <textarea
+                            id="descricao"
+                            name="descricao"
+                            rows="4"
+                            maxlength="500"
+                        ></textarea>
+                    </div>
 
-            <div>
-                <label for="categoria">Categoria:</label>
-                <select id="categoria" name="categoria">
-                    <option value="">Selecione uma categoria</option>
-                    <option value="estudos">Estudos</option>
-                    <option value="trabalho">Trabalho</option>
-                    <option value="pessoal">Pessoal</option>
-                    <option value="outros">Outros</option>
-                </select>
-            </div>
+                    <div>
+                        <label for="categoria">Categoria:</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Selecione uma categoria</option>
+                            <option value="estudos">Estudos</option>
+                            <option value="trabalho">Trabalho</option>
+                            <option value="pessoal">Pessoal</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
 
-            <div>
-                <label for="dataConclusao">Data de conclusão:</label>
-                <input type="date" id="dataConclusao" name="dataConclusao">
-            </div>
+                    <div>
+                        <label for="dataConclusao">Data de conclusão:</label>
+                        <input
+                            type="date"
+                            id="dataConclusao"
+                            name="dataConclusao"
+                        >
+                    </div>
 
-            <div>
-                <label for="status">Status:</label>
-                <select id="status" name="status">
-                    <option value="">Selecione o status</option>
-                    <option value="pendente">Pendente</option>
-                    <option value="andamento">Em andamento</option>
-                    <option value="concluida">Concluída</option>
-                </select>
-            </div>
+                    <div>
+                        <label for="status">Status:</label>
+                        <select id="status" name="status" required>
+                            <option value="">Selecione o status</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="andamento">Em andamento</option>
+                            <option value="concluida">Concluída</option>
+                        </select>
+                    </div>
 
-            <div>
-                <label for="importancia">Nível de importância:</label>
-                <select id="importancia" name="importancia">
-                    <option value="">Selecione a importância</option>
-                    <option value="baixa">Baixa</option>
-                    <option value="media">Média</option>
-                    <option value="alta">Alta</option>
-                </select>
-            </div>
+                    <div>
+                        <label for="importancia">Nível de importância:</label>
+                        <select id="importancia" name="importancia" required>
+                            <option value="">Selecione a importância</option>
+                            <option value="baixa">Baixa</option>
+                            <option value="media">Média</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
 
-                <button type="submit">Cadastrar tarefa</button>
-            </fieldset>
-        </form>
+                    <button type="submit">Cadastrar tarefa</button>
+                </fieldset>
+            </form>
         </section>
 
         <section id="tarefas">
@@ -100,7 +120,12 @@
 
             <div>
                 <label for="pesquisa">Pesquisar tarefa:</label>
-                <input type="search" id="pesquisa" name="pesquisa" placeholder="Digite o nome da tarefa">
+                <input
+                    type="search"
+                    id="pesquisa"
+                    name="pesquisa"
+                    placeholder="Digite o nome da tarefa"
+                >
             </div>
 
             <div>
@@ -117,11 +142,15 @@
             <div>
                 <label for="ordenacao">Ordenar por:</label>
                 <select id="ordenacao" name="ordenacao">
-                    <option value="">Selecione</option>
-                    <option value="nome">Nome</option>
-                    <option value="data">Data de conclusão</option>
-                    <option value="importancia">Nível de importância</option>
-                    <option value="status">Status</option>
+                    <option value="">Ordem padrão</option>
+                    <option value="nome-asc">Nome (A-Z)</option>
+                    <option value="nome-desc">Nome (Z-A)</option>
+                    <option value="data-asc">Data mais próxima</option>
+                    <option value="data-desc">Data mais distante</option>
+                    <option value="importancia-asc">Menor importância</option>
+                    <option value="importancia-desc">Maior importância</option>
+                    <option value="identificador-asc">Identificador crescente</option>
+                    <option value="identificador-desc">Identificador decrescente</option>
                 </select>
             </div>
 
@@ -139,47 +168,7 @@
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Estudar HTML</td>
-                        <td>Estudos</td>
-                        <td>05/10/2026</td>
-                        <td>Pendente</td>
-                        <td>Alta</td>
-                        <td>
-                            <button type="button">Ver detalhes</button>
-                            <button type="button">Editar</button>
-                            <button type="button">Excluir</button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Fazer trabalho da faculdade</td>
-                        <td>Estudos</td>
-                        <td>10/10/2026</td>
-                        <td>Em andamento</td>
-                        <td>Alta</td>
-                        <td>
-                            <button type="button">Ver detalhes</button>
-                            <button type="button">Editar</button>
-                            <button type="button">Excluir</button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>3</td>
-                        <td>Organizar documentos</td>
-                        <td>Pessoal</td>
-                        <td>15/10/2026</td>
-                        <td>Concluída</td>
-                        <td>Média</td>
-                        <td>
-                            <button type="button">Ver detalhes</button>
-                            <button type="button">Editar</button>
-                            <button type="button">Excluir</button>
-                        </td>
-                    </tr>
+                    <!-- As tarefas serão inseridas dinamicamente pelo JavaScript. -->
                 </tbody>
             </table>
         </section>
@@ -188,20 +177,12 @@
             <h2>Detalhes da tarefa</h2>
 
             <article>
-                <h3>Estudar HTML</h3>
-
-                <p><strong>Identificador:</strong> 1</p>
-                <p><strong>Descrição:</strong> Estudar os principais elementos HTML e sua utilização.</p>
-                <p><strong>Categoria:</strong> Estudos</p>
-                <p><strong>Data de conclusão:</strong> 05/10/2026</p>
-                <p><strong>Status:</strong> Pendente</p>
-                <p><strong>Nível de importância:</strong> Alta</p>
-
-                <button type="button">Editar tarefa</button>
-                <button type="button">Excluir tarefa</button>
+                <p>
+                    Selecione "Ver detalhes" em uma tarefa para consultar
+                    suas informações.
+                </p>
             </article>
         </section>
-
     </main>
 
     <footer>
@@ -209,6 +190,5 @@
     </footer>
 
     <script src="assets/js/script.js"></script>
-
 </body>
 </html>
