@@ -41,7 +41,29 @@ const tarefasIniciais = [
     }
 ];
 
-// Recupera as tarefas salvas ou inicia com as tarefas de exemplo.
+let tarefas = carregarTarefas();
+let identificadorEmEdicao = null;
+
+const botaoSalvar = formulario.querySelector(
+    'button[type="submit"], input[type="submit"]'
+);
+
+const textoOriginalBotao = botaoSalvar
+    ? (botaoSalvar.tagName === "INPUT"
+        ? botaoSalvar.value
+        : botaoSalvar.textContent)
+    : "Cadastrar tarefa";
+
+// Cria um botão para cancelar a edição.
+const botaoCancelarEdicao = document.createElement("button");
+botaoCancelarEdicao.type = "button";
+botaoCancelarEdicao.textContent = "Cancelar edição";
+botaoCancelarEdicao.hidden = true;
+
+if (botaoSalvar) {
+    botaoSalvar.insertAdjacentElement("afterend", botaoCancelarEdicao);
+}
+
 function carregarTarefas() {
     const dadosSalvos = localStorage.getItem(CHAVE_ARMAZENAMENTO);
 
@@ -65,9 +87,6 @@ function carregarTarefas() {
     return [...tarefasIniciais];
 }
 
-let tarefas = carregarTarefas();
-
-// Salva a lista atual no navegador.
 function salvarTarefas() {
     localStorage.setItem(
         CHAVE_ARMAZENAMENTO,
@@ -134,6 +153,48 @@ function mostrarDetalhes(tarefa) {
     );
 }
 
+function iniciarEdicao(tarefa) {
+    identificadorEmEdicao = tarefa.identificador;
+
+    campoNome.value = tarefa.nome;
+    campoDescricao.value = tarefa.descricao;
+    campoCategoria.value = tarefa.categoria;
+    campoData.value = tarefa.dataConclusao;
+    campoStatus.value = tarefa.status;
+    campoImportancia.value = tarefa.importancia;
+
+    if (botaoSalvar) {
+        if (botaoSalvar.tagName === "INPUT") {
+            botaoSalvar.value = "Salvar alterações";
+        } else {
+            botaoSalvar.textContent = "Salvar alterações";
+        }
+    }
+
+    botaoCancelarEdicao.hidden = false;
+
+    document.querySelector("#cadastro").scrollIntoView({
+        behavior: "smooth"
+    });
+
+    campoNome.focus();
+}
+
+function cancelarEdicao() {
+    identificadorEmEdicao = null;
+    formulario.reset();
+
+    if (botaoSalvar) {
+        if (botaoSalvar.tagName === "INPUT") {
+            botaoSalvar.value = textoOriginalBotao;
+        } else {
+            botaoSalvar.textContent = textoOriginalBotao;
+        }
+    }
+
+    botaoCancelarEdicao.hidden = true;
+}
+
 function excluirTarefa(identificador) {
     const confirmar = confirm(
         "Tem certeza de que deseja excluir esta tarefa?"
@@ -146,6 +207,10 @@ function excluirTarefa(identificador) {
     tarefas = tarefas.filter(function (tarefa) {
         return tarefa.identificador !== identificador;
     });
+
+    if (identificadorEmEdicao === identificador) {
+        cancelarEdicao();
+    }
 
     salvarTarefas();
     renderizarTarefas();
@@ -179,7 +244,7 @@ function renderizarTarefas() {
         botaoEditar.type = "button";
         botaoEditar.textContent = "Editar";
         botaoEditar.addEventListener("click", function () {
-            alert("A edição será implementada na próxima etapa.");
+            iniciarEdicao(tarefa);
         });
 
         const botaoExcluir = document.createElement("button");
@@ -220,6 +285,33 @@ function cadastrarTarefa(evento) {
         return;
     }
 
+    if (identificadorEmEdicao !== null) {
+        // Atualiza a tarefa existente sem criar uma duplicata.
+        const indice = tarefas.findIndex(function (tarefa) {
+            return tarefa.identificador === identificadorEmEdicao;
+        });
+
+        if (indice !== -1) {
+            tarefas[indice] = {
+                identificador: identificadorEmEdicao,
+                nome: nome,
+                descricao: campoDescricao.value.trim(),
+                categoria: campoCategoria.value,
+                dataConclusao: campoData.value,
+                status: campoStatus.value,
+                importancia: campoImportancia.value
+            };
+        }
+
+        salvarTarefas();
+        cancelarEdicao();
+        renderizarTarefas();
+
+        alert("Tarefa atualizada com sucesso!");
+        return;
+    }
+
+    // Cadastra uma tarefa nova.
     const proximoIdentificador = tarefas.length > 0
         ? Math.max(...tarefas.map(function (tarefa) {
             return tarefa.identificador;
@@ -242,9 +334,10 @@ function cadastrarTarefa(evento) {
     renderizarTarefas();
     formulario.reset();
 
-    alert("Tarefa cadastrada e salva com sucesso!");
+    alert("Tarefa cadastrada com sucesso!");
 }
 
 formulario.addEventListener("submit", cadastrarTarefa);
+botaoCancelarEdicao.addEventListener("click", cancelarEdicao);
 
 renderizarTarefas();
