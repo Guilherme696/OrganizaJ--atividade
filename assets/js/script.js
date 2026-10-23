@@ -2,7 +2,6 @@
 const formulario = document.querySelector("#cadastro form");
 const tabelaTarefas = document.querySelector("#tarefas tbody");
 
-const campoIdentificador = document.querySelector("#identificador");
 const campoNome = document.querySelector("#nome");
 const campoDescricao = document.querySelector("#descricao");
 const campoCategoria = document.querySelector("#categoria");
@@ -10,7 +9,9 @@ const campoData = document.querySelector("#dataConclusao");
 const campoStatus = document.querySelector("#status");
 const campoImportancia = document.querySelector("#importancia");
 
-let tarefas = [
+const CHAVE_ARMAZENAMENTO = "organizaJaTarefas";
+
+const tarefasIniciais = [
     {
         identificador: 1,
         nome: "Estudar HTML",
@@ -39,6 +40,40 @@ let tarefas = [
         importancia: "media"
     }
 ];
+
+// Recupera as tarefas salvas ou inicia com as tarefas de exemplo.
+function carregarTarefas() {
+    const dadosSalvos = localStorage.getItem(CHAVE_ARMAZENAMENTO);
+
+    if (dadosSalvos !== null) {
+        try {
+            const tarefasSalvas = JSON.parse(dadosSalvos);
+
+            if (Array.isArray(tarefasSalvas)) {
+                return tarefasSalvas;
+            }
+        } catch (erro) {
+            console.error("Erro ao recuperar tarefas:", erro);
+        }
+    }
+
+    localStorage.setItem(
+        CHAVE_ARMAZENAMENTO,
+        JSON.stringify(tarefasIniciais)
+    );
+
+    return [...tarefasIniciais];
+}
+
+let tarefas = carregarTarefas();
+
+// Salva a lista atual no navegador.
+function salvarTarefas() {
+    localStorage.setItem(
+        CHAVE_ARMAZENAMENTO,
+        JSON.stringify(tarefas)
+    );
+}
 
 function formatarCategoria(categoria) {
     const categorias = {
@@ -86,6 +121,38 @@ function criarCelula(texto) {
     return celula;
 }
 
+function mostrarDetalhes(tarefa) {
+    alert(
+        "Detalhes da tarefa\n\n" +
+        "Identificador: " + tarefa.identificador + "\n" +
+        "Nome: " + tarefa.nome + "\n" +
+        "Descrição: " + (tarefa.descricao || "Sem descrição") + "\n" +
+        "Categoria: " + formatarCategoria(tarefa.categoria) + "\n" +
+        "Data de conclusão: " + formatarData(tarefa.dataConclusao) + "\n" +
+        "Status: " + formatarStatus(tarefa.status) + "\n" +
+        "Importância: " + formatarImportancia(tarefa.importancia)
+    );
+}
+
+function excluirTarefa(identificador) {
+    const confirmar = confirm(
+        "Tem certeza de que deseja excluir esta tarefa?"
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    tarefas = tarefas.filter(function (tarefa) {
+        return tarefa.identificador !== identificador;
+    });
+
+    salvarTarefas();
+    renderizarTarefas();
+
+    alert("Tarefa excluída com sucesso!");
+}
+
 function renderizarTarefas() {
     tabelaTarefas.replaceChildren();
 
@@ -105,7 +172,7 @@ function renderizarTarefas() {
         botaoDetalhes.type = "button";
         botaoDetalhes.textContent = "Ver detalhes";
         botaoDetalhes.addEventListener("click", function () {
-            alert("Detalhes da tarefa: " + tarefa.nome);
+            mostrarDetalhes(tarefa);
         });
 
         const botaoEditar = document.createElement("button");
@@ -119,7 +186,7 @@ function renderizarTarefas() {
         botaoExcluir.type = "button";
         botaoExcluir.textContent = "Excluir";
         botaoExcluir.addEventListener("click", function () {
-            alert("A exclusão será implementada na próxima etapa.");
+            excluirTarefa(tarefa.identificador);
         });
 
         celulaAcoes.append(
@@ -144,13 +211,19 @@ function cadastrarTarefa(evento) {
         return;
     }
 
-    if (!campoCategoria.value || !campoStatus.value || !campoImportancia.value) {
+    if (
+        !campoCategoria.value ||
+        !campoStatus.value ||
+        !campoImportancia.value
+    ) {
         alert("Preencha a categoria, o status e a importância.");
         return;
     }
 
     const proximoIdentificador = tarefas.length > 0
-        ? Math.max(...tarefas.map(tarefa => tarefa.identificador)) + 1
+        ? Math.max(...tarefas.map(function (tarefa) {
+            return tarefa.identificador;
+        })) + 1
         : 1;
 
     const novaTarefa = {
@@ -165,10 +238,11 @@ function cadastrarTarefa(evento) {
 
     tarefas.push(novaTarefa);
 
+    salvarTarefas();
     renderizarTarefas();
     formulario.reset();
 
-    alert("Tarefa cadastrada com sucesso!");
+    alert("Tarefa cadastrada e salva com sucesso!");
 }
 
 formulario.addEventListener("submit", cadastrarTarefa);
