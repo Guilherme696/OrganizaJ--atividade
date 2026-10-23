@@ -4,191 +4,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OrganizaJá: organize suas tarefas de estudos, trabalho e vida pessoal.">
     <title>OrganizaJá - Gerenciador de Tarefas</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/script.js" defer></script>
 </head>
-
 <body>
-    <header>
-        <h1>OrganizaJá</h1>
-        <p>Gerenciador de Tarefas</p>
-
-        <nav>
-            <ul>
-                <li><a href="#inicio">Início</a></li>
-                <li><a href="#cadastro">Cadastrar tarefa</a></li>
-                <li><a href="#tarefas">Minhas tarefas</a></li>
-                <li><a href="#detalhes">Detalhes</a></li>
-            </ul>
-        </nav>
+    <header class="cabecalho">
+        <div class="container cabecalho-conteudo">
+            <a class="logo" href="#inicio">OrganizaJá</a>
+            <nav aria-label="Navegação principal">
+                <a href="#inicio">Início</a>
+                <a href="#cadastro">Cadastrar tarefa</a>
+                <a href="#tarefas">Minhas tarefas</a>
+                <a href="#motivacao">Motivação</a>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <section id="inicio">
-            <h2>Organize suas tarefas</h2>
-            <p>
-                Gerencie suas tarefas de forma simples, organizada e eficiente.
-            </p>
+    <main class="container">
+        <section id="inicio" class="apresentacao">
+            <span class="etiqueta">Organize seu dia</span>
+            <h1>Suas tarefas, sua organização.</h1>
+            <p>Cadastre atividades, acompanhe seu progresso e mantenha tudo em um só lugar.</p>
+            <a class="botao botao-principal" href="#cadastro">Começar agora</a>
         </section>
 
-        <section id="cadastro">
-            <h2>Cadastrar nova tarefa</h2>
+        <section id="cadastro" class="secao">
+            <div class="titulo-secao">
+                <span class="etiqueta">Gerenciamento</span>
+                <h2 id="tituloFormulario">Cadastrar nova tarefa</h2>
+                <p>Preencha os campos para adicionar uma tarefa à sua lista.</p>
+            </div>
 
-            <form>
-                <fieldset>
-                    <legend>Informações da tarefa</legend>
+            <form id="formTarefa" class="formulario">
+                <input type="hidden" id="identificador">
 
-                    <div>
-                        <label for="identificador">Identificador:</label>
-                        <input
-                            type="number"
-                            id="identificador"
-                            name="identificador"
-                            disabled
-                            placeholder="Gerado automaticamente"
-                        >
-                    </div>
+                <div class="campo">
+                    <label for="nome">Nome da tarefa *</label>
+                    <input type="text" id="nome" name="nome"
+                           maxlength="100" placeholder="Ex.: Estudar JavaScript" required>
+                </div>
 
-                    <div>
-                        <label for="nome">Nome da tarefa:</label>
-                        <input
-                            type="text"
-                            id="nome"
-                            name="nome"
-                            required
-                            maxlength="100"
-                        >
-                    </div>
+                <div class="campo">
+                    <label for="descricao">Descrição *</label>
+                    <textarea id="descricao" name="descricao" rows="3"
+                              maxlength="500" placeholder="Descreva o que precisa ser feito"
+                              required></textarea>
+                </div>
 
-                    <div>
-                        <label for="descricao">Descrição:</label>
-                        <textarea
-                            id="descricao"
-                            name="descricao"
-                            rows="4"
-                            maxlength="500"
-                        ></textarea>
-                    </div>
-
-                    <div>
-                        <label for="categoria">Categoria:</label>
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="categoria">Categoria *</label>
                         <select id="categoria" name="categoria" required>
-                            <option value="">Selecione uma categoria</option>
-                            <option value="estudos">Estudos</option>
-                            <option value="trabalho">Trabalho</option>
-                            <option value="pessoal">Pessoal</option>
-                            <option value="outros">Outros</option>
+                            <option value="">Selecione</option>
+                            <option value="Estudos">Estudos</option>
+                            <option value="Trabalho">Trabalho</option>
+                            <option value="Pessoal">Pessoal</option>
+                            <option value="Outros">Outros</option>
                         </select>
                     </div>
 
-                    <div>
-                        <label for="dataConclusao">Data de conclusão:</label>
-                        <input
-                            type="date"
-                            id="dataConclusao"
-                            name="dataConclusao"
-                        >
+                    <div class="campo">
+                        <label for="dataConclusao">Data de conclusão *</label>
+                        <input type="date" id="dataConclusao" name="dataConclusao" required>
                     </div>
 
-                    <div>
-                        <label for="status">Status:</label>
+                    <div class="campo">
+                        <label for="status">Status *</label>
                         <select id="status" name="status" required>
-                            <option value="">Selecione o status</option>
-                            <option value="pendente">Pendente</option>
-                            <option value="andamento">Em andamento</option>
-                            <option value="concluida">Concluída</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em andamento">Em andamento</option>
+                            <option value="Concluída">Concluída</option>
                         </select>
                     </div>
 
-                    <div>
-                        <label for="importancia">Nível de importância:</label>
+                    <div class="campo">
+                        <label for="importancia">Importância *</label>
                         <select id="importancia" name="importancia" required>
-                            <option value="">Selecione a importância</option>
-                            <option value="baixa">Baixa</option>
-                            <option value="media">Média</option>
-                            <option value="alta">Alta</option>
+                            <option value="Baixa">Baixa</option>
+                            <option value="Média" selected>Média</option>
+                            <option value="Alta">Alta</option>
                         </select>
                     </div>
+                </div>
 
-                    <button type="submit">Cadastrar tarefa</button>
-                </fieldset>
+                <p class="texto-ajuda">* Campos obrigatórios.</p>
+
+                <div class="acoes-formulario">
+                    <button type="submit" id="botaoSalvar" class="botao botao-principal">
+                        Cadastrar tarefa
+                    </button>
+                    <button type="button" id="botaoCancelarEdicao"
+                            class="botao botao-secundario" hidden>
+                        Cancelar edição
+                    </button>
+                </div>
+
+                <p id="mensagemFormulario" class="mensagem" role="status" aria-live="polite"></p>
             </form>
         </section>
 
-        <section id="tarefas">
-            <h2>Minhas tarefas</h2>
-
-            <div>
-                <label for="pesquisa">Pesquisar tarefa:</label>
-                <input
-                    type="search"
-                    id="pesquisa"
-                    name="pesquisa"
-                    placeholder="Digite o nome da tarefa"
-                >
+        <section id="tarefas" class="secao">
+            <div class="titulo-secao">
+                <span class="etiqueta">Sua lista</span>
+                <h2>Minhas tarefas</h2>
+                <p>Pesquise, filtre, ordene e gerencie suas atividades.</p>
             </div>
 
-            <div>
-                <label for="filtroCategoria">Filtrar por categoria:</label>
-                <select id="filtroCategoria" name="filtroCategoria">
-                    <option value="">Todas as categorias</option>
-                    <option value="estudos">Estudos</option>
-                    <option value="trabalho">Trabalho</option>
-                    <option value="pessoal">Pessoal</option>
-                    <option value="outros">Outros</option>
-                </select>
+            <div class="resumo-tarefas" aria-live="polite">
+                <div class="cartao-resumo">
+                    <span>Total de tarefas</span>
+                    <strong id="totalTarefas">0</strong>
+                </div>
+                <div class="cartao-resumo">
+                    <span>Pendentes</span>
+                    <strong id="totalPendentes">0</strong>
+                </div>
+                <div class="cartao-resumo">
+                    <span>Concluídas</span>
+                    <strong id="totalConcluidas">0</strong>
+                </div>
             </div>
 
-            <div>
-                <label for="ordenacao">Ordenar por:</label>
-                <select id="ordenacao" name="ordenacao">
-                    <option value="">Ordem padrão</option>
-                    <option value="nome-asc">Nome (A-Z)</option>
-                    <option value="nome-desc">Nome (Z-A)</option>
-                    <option value="data-asc">Data mais próxima</option>
-                    <option value="data-desc">Data mais distante</option>
-                    <option value="importancia-asc">Menor importância</option>
-                    <option value="importancia-desc">Maior importância</option>
-                    <option value="identificador-asc">Identificador crescente</option>
-                    <option value="identificador-desc">Identificador decrescente</option>
-                </select>
+            <div class="painel-filtros">
+                <div class="campo">
+                    <label for="pesquisa">Pesquisar tarefa</label>
+                    <input type="search" id="pesquisa"
+                           placeholder="Digite o nome ou a descrição">
+                </div>
+
+                <div class="campo">
+                    <label for="filtroCategoria">Filtrar por categoria</label>
+                    <select id="filtroCategoria">
+                        <option value="">Todas as categorias</option>
+                        <option value="Estudos">Estudos</option>
+                        <option value="Trabalho">Trabalho</option>
+                        <option value="Pessoal">Pessoal</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="filtroStatus">Filtrar por status</label>
+                    <select id="filtroStatus">
+                        <option value="">Todos os status</option>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em andamento">Em andamento</option>
+                        <option value="Concluída">Concluída</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="ordenacao">Ordenar por</label>
+                    <select id="ordenacao">
+                        <option value="data-asc">Data mais próxima</option>
+                        <option value="data-desc">Data mais distante</option>
+                        <option value="nome-asc">Nome (A–Z)</option>
+                        <option value="nome-desc">Nome (Z–A)</option>
+                        <option value="importancia-desc">Maior importância</option>
+                        <option value="importancia-asc">Menor importância</option>
+                        <option value="id-desc">Mais recentes primeiro</option>
+                        <option value="id-asc">Mais antigas primeiro</option>
+                    </select>
+                </div>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Identificador</th>
-                        <th>Nome</th>
-                        <th>Categoria</th>
-                        <th>Data de conclusão</th>
-                        <th>Status</th>
-                        <th>Importância</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <!-- As tarefas serão inseridas dinamicamente pelo JavaScript. -->
-                </tbody>
-            </table>
+            <div class="tabela-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Tarefa</th>
+                            <th scope="col">Categoria</th>
+                            <th scope="col">Conclusão</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Importância</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaTarefas"></tbody>
+                </table>
+                <p id="mensagemLista" class="mensagem-lista" hidden>
+                    Nenhuma tarefa encontrada.
+                </p>
+            </div>
         </section>
 
-        <section id="detalhes">
-            <h2>Detalhes da tarefa</h2>
-
-            <article>
-                <p>
-                    Selecione "Ver detalhes" em uma tarefa para consultar
-                    suas informações.
-                </p>
+        <section id="detalhes" class="secao">
+            <div class="titulo-secao">
+                <span class="etiqueta">Informações</span>
+                <h2>Detalhes da tarefa</h2>
+                <p>Selecione “Ver detalhes” em uma tarefa para consultar suas informações.</p>
+            </div>
+            <article id="conteudoDetalhes" class="cartao-detalhes">
+                <p>Nenhuma tarefa selecionada.</p>
             </article>
+        </section>
+
+        <section id="motivacao" class="secao secao-motivacao">
+            <div class="titulo-secao">
+                <span class="etiqueta">Inspiração</span>
+                <h2>Inspiração para continuar</h2>
+                <p>Busque uma mensagem para manter o foco nas suas tarefas.</p>
+            </div>
+
+            <blockquote class="bloco-frase">
+                <p id="textoFrase">Clique no botão para carregar uma frase motivacional.</p>
+                <footer id="autorFrase"></footer>
+            </blockquote>
+
+            <button type="button" id="carregarFrase" class="botao botao-principal">
+                Nova frase
+            </button>
+            <p id="estadoFrase" class="mensagem" role="status" aria-live="polite"></p>
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2026 OrganizaJá - Gerenciador de Tarefas</p>
+    <footer class="rodape">
+        <div class="container">
+            <p>OrganizaJá — organização simples para o seu dia a dia.</p>
+        </div>
     </footer>
-
-    <script src="assets/js/script.js"></script>
 </body>
 </html>

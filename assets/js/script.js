@@ -1,7 +1,9 @@
+"use strict";
 
-const formulario = document.querySelector("#cadastro form");
-const tabelaTarefas = document.querySelector("#tarefas tbody");
+const CHAVE_ARMAZENAMENTO = "organizaJaTarefas";
 
+const formulario = document.querySelector("#formTarefa");
+const campoIdentificador = document.querySelector("#identificador");
 const campoNome = document.querySelector("#nome");
 const campoDescricao = document.querySelector("#descricao");
 const campoCategoria = document.querySelector("#categoria");
@@ -9,129 +11,124 @@ const campoData = document.querySelector("#dataConclusao");
 const campoStatus = document.querySelector("#status");
 const campoImportancia = document.querySelector("#importancia");
 
+const tituloFormulario = document.querySelector("#tituloFormulario");
+const botaoSalvar = document.querySelector("#botaoSalvar");
+const botaoCancelarEdicao = document.querySelector("#botaoCancelarEdicao");
+const mensagemFormulario = document.querySelector("#mensagemFormulario");
+
 const campoPesquisa = document.querySelector("#pesquisa");
 const campoFiltroCategoria = document.querySelector("#filtroCategoria");
+const campoFiltroStatus = document.querySelector("#filtroStatus");
 const campoOrdenacao = document.querySelector("#ordenacao");
 
-const CHAVE_ARMAZENAMENTO = "organizaJaTarefas";
+const listaTarefas = document.querySelector("#listaTarefas");
+const mensagemLista = document.querySelector("#mensagemLista");
+
+const totalTarefas = document.querySelector("#totalTarefas");
+const totalPendentes = document.querySelector("#totalPendentes");
+const totalConcluidas = document.querySelector("#totalConcluidas");
+
+const conteudoDetalhes = document.querySelector("#conteudoDetalhes");
 
 const tarefasIniciais = [
     {
-        identificador: 1,
+        id: 1,
         nome: "Estudar HTML",
-        descricao: "Estudar os principais elementos HTML e sua utilização.",
-        categoria: "estudos",
-        dataConclusao: "2026-10-05",
-        status: "pendente",
-        importancia: "alta"
+        descricao: "Revisar a estrutura das páginas HTML e seus elementos.",
+        categoria: "Estudos",
+        dataConclusao: "2026-10-25",
+        status: "Pendente",
+        importancia: "Alta"
     },
     {
-        identificador: 2,
+        id: 2,
         nome: "Fazer trabalho da faculdade",
-        descricao: "Desenvolver o trabalho da faculdade.",
-        categoria: "estudos",
-        dataConclusao: "2026-10-10",
-        status: "andamento",
-        importancia: "alta"
+        descricao: "Avançar nas atividades e trabalhos da faculdade.",
+        categoria: "Estudos",
+        dataConclusao: "2026-10-28",
+        status: "Em andamento",
+        importancia: "Alta"
     },
     {
-        identificador: 3,
+        id: 3,
         nome: "Organizar documentos",
-        descricao: "Organizar documentos pessoais.",
-        categoria: "pessoal",
-        dataConclusao: "2026-10-15",
-        status: "concluida",
-        importancia: "media"
+        descricao: "Separar e organizar os documentos pessoais.",
+        categoria: "Pessoal",
+        dataConclusao: "2026-10-30",
+        status: "Pendente",
+        importancia: "Média"
     }
 ];
 
 let tarefas = carregarTarefas();
-let identificadorEmEdicao = null;
-
-const botaoSalvar =
-    formulario.querySelector('button[type="submit"]') ||
-    formulario.querySelector('input[type="submit"]') ||
-    formulario.querySelector("button:not([type])");
-
-const textoOriginalBotao = botaoSalvar
-    ? (botaoSalvar.tagName === "INPUT"
-        ? botaoSalvar.value
-        : botaoSalvar.textContent)
-    : "Cadastrar tarefa";
-
-const botaoCancelarEdicao = document.createElement("button");
-botaoCancelarEdicao.type = "button";
-botaoCancelarEdicao.textContent = "Cancelar edição";
-botaoCancelarEdicao.hidden = true;
-
-if (botaoSalvar) {
-    botaoSalvar.insertAdjacentElement("afterend", botaoCancelarEdicao);
-}
 
 function carregarTarefas() {
-    const dadosSalvos = localStorage.getItem(CHAVE_ARMAZENAMENTO);
+    try {
+        const dadosSalvos = localStorage.getItem(CHAVE_ARMAZENAMENTO);
 
-    if (dadosSalvos !== null) {
-        try {
-            const tarefasSalvas = JSON.parse(dadosSalvos);
+        if (dadosSalvos === null) {
+            localStorage.setItem(
+                CHAVE_ARMAZENAMENTO,
+                JSON.stringify(tarefasIniciais)
+            );
 
-            if (Array.isArray(tarefasSalvas)) {
-                return tarefasSalvas;
-            }
-        } catch (erro) {
-            console.error("Erro ao recuperar tarefas:", erro);
+            return tarefasIniciais.map(tarefa => ({ ...tarefa }));
         }
+
+        const tarefasSalvas = JSON.parse(dadosSalvos);
+
+        if (!Array.isArray(tarefasSalvas)) {
+            throw new Error("Os dados armazenados não são válidos.");
+        }
+
+        return tarefasSalvas.filter(tarefa =>
+            tarefa &&
+            Number.isInteger(tarefa.id) &&
+            typeof tarefa.nome === "string" &&
+            typeof tarefa.descricao === "string" &&
+            typeof tarefa.categoria === "string" &&
+            typeof tarefa.dataConclusao === "string" &&
+            typeof tarefa.status === "string" &&
+            typeof tarefa.importancia === "string"
+        );
+    } catch (erro) {
+        console.error("Erro ao carregar as tarefas:", erro);
+
+        return tarefasIniciais.map(tarefa => ({ ...tarefa }));
     }
-
-    localStorage.setItem(
-        CHAVE_ARMAZENAMENTO,
-        JSON.stringify(tarefasIniciais)
-    );
-
-    return [...tarefasIniciais];
 }
 
 function salvarTarefas() {
-    localStorage.setItem(
-        CHAVE_ARMAZENAMENTO,
-        JSON.stringify(tarefas)
-    );
+    try {
+        localStorage.setItem(
+            CHAVE_ARMAZENAMENTO,
+            JSON.stringify(tarefas)
+        );
+
+        return true;
+    } catch (erro) {
+        console.error("Erro ao salvar as tarefas:", erro);
+        mostrarMensagem(
+            "Não foi possível salvar os dados neste navegador.",
+            "erro"
+        );
+
+        return false;
+    }
 }
 
-function formatarCategoria(categoria) {
-    const categorias = {
-        estudos: "Estudos",
-        trabalho: "Trabalho",
-        pessoal: "Pessoal",
-        outros: "Outros"
-    };
+function mostrarMensagem(texto, tipo = "") {
+    mensagemFormulario.textContent = texto;
+    mensagemFormulario.className = "mensagem";
 
-    return categorias[categoria] || categoria;
-}
-
-function formatarStatus(status) {
-    const statusTarefas = {
-        pendente: "Pendente",
-        andamento: "Em andamento",
-        concluida: "Concluída"
-    };
-
-    return statusTarefas[status] || status;
-}
-
-function formatarImportancia(importancia) {
-    const importancias = {
-        baixa: "Baixa",
-        media: "Média",
-        alta: "Alta"
-    };
-
-    return importancias[importancia] || importancia;
+    if (tipo) {
+        mensagemFormulario.classList.add(tipo);
+    }
 }
 
 function formatarData(data) {
     if (!data) {
-        return "Não definida";
+        return "Não informada";
     }
 
     const partes = data.split("-");
@@ -143,44 +140,145 @@ function formatarData(data) {
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-function criarCelula(texto) {
-    const celula = document.createElement("td");
-    celula.textContent = texto;
-    return celula;
+function criarElemento(tag, texto, classe = "") {
+    const elemento = document.createElement(tag);
+
+    if (texto !== undefined && texto !== null) {
+        elemento.textContent = texto;
+    }
+
+    if (classe) {
+        elemento.className = classe;
+    }
+
+    return elemento;
 }
 
-function mostrarDetalhes(tarefa) {
-    alert(
-        "Detalhes da tarefa\n\n" +
-        "Identificador: " + tarefa.identificador + "\n" +
-        "Nome: " + tarefa.nome + "\n" +
-        "Descrição: " + (tarefa.descricao || "Sem descrição") + "\n" +
-        "Categoria: " + formatarCategoria(tarefa.categoria) + "\n" +
-        "Data de conclusão: " + formatarData(tarefa.dataConclusao) + "\n" +
-        "Status: " + formatarStatus(tarefa.status) + "\n" +
-        "Importância: " + formatarImportancia(tarefa.importancia)
-    );
+function criarBotao(texto, classe, acao, id) {
+    const botao = criarElemento("button", texto, `botao botao-pequeno ${classe}`);
+
+    botao.type = "button";
+    botao.dataset.acao = acao;
+    botao.dataset.id = String(id);
+
+    return botao;
 }
 
-function iniciarEdicao(tarefa) {
-    identificadorEmEdicao = tarefa.identificador;
+function obterProximoId() {
+    if (tarefas.length === 0) {
+        return 1;
+    }
 
+    return Math.max(...tarefas.map(tarefa => tarefa.id)) + 1;
+}
+
+function cadastrarTarefa(evento) {
+    evento.preventDefault();
+
+    if (!formulario.reportValidity()) {
+        return;
+    }
+
+    const nome = campoNome.value.trim();
+    const descricao = campoDescricao.value.trim();
+    const categoria = campoCategoria.value;
+    const dataConclusao = campoData.value;
+    const status = campoStatus.value;
+    const importancia = campoImportancia.value;
+
+    if (!nome || !descricao) {
+        mostrarMensagem(
+            "Preencha o nome e a descrição da tarefa.",
+            "erro"
+        );
+        return;
+    }
+
+    const identificador = campoIdentificador.value;
+
+    if (identificador) {
+        const id = Number(identificador);
+        const indice = tarefas.findIndex(tarefa => tarefa.id === id);
+
+        if (indice === -1) {
+            mostrarMensagem(
+                "Não foi possível encontrar a tarefa para edição.",
+                "erro"
+            );
+            cancelarEdicao();
+            return;
+        }
+
+        const tarefaAnterior = tarefas[indice];
+
+        tarefas[indice] = {
+            id,
+            nome,
+            descricao,
+            categoria,
+            dataConclusao,
+            status,
+            importancia
+        };
+
+        if (!salvarTarefas()) {
+            tarefas[indice] = tarefaAnterior;
+            return;
+        }
+
+        cancelarEdicao();
+        mostrarMensagem("Tarefa atualizada com sucesso!", "sucesso");
+    } else {
+        const novaTarefa = {
+            id: obterProximoId(),
+            nome,
+            descricao,
+            categoria,
+            dataConclusao,
+            status,
+            importancia
+        };
+
+        tarefas.push(novaTarefa);
+
+        if (!salvarTarefas()) {
+            tarefas.pop();
+            return;
+        }
+
+        formulario.reset();
+        campoStatus.value = "Pendente";
+        campoImportancia.value = "Média";
+
+        mostrarMensagem("Tarefa cadastrada com sucesso!", "sucesso");
+    }
+
+    renderizarTarefas();
+}
+
+formulario.addEventListener("submit", cadastrarTarefa);
+
+function iniciarEdicao(id) {
+    const tarefa = tarefas.find(item => item.id === id);
+
+    if (!tarefa) {
+        mostrarMensagem("Tarefa não encontrada.", "erro");
+        return;
+    }
+
+    campoIdentificador.value = tarefa.id;
     campoNome.value = tarefa.nome;
-    campoDescricao.value = tarefa.descricao || "";
+    campoDescricao.value = tarefa.descricao;
     campoCategoria.value = tarefa.categoria;
-    campoData.value = tarefa.dataConclusao || "";
+    campoData.value = tarefa.dataConclusao;
     campoStatus.value = tarefa.status;
     campoImportancia.value = tarefa.importancia;
 
-    if (botaoSalvar) {
-        if (botaoSalvar.tagName === "INPUT") {
-            botaoSalvar.value = "Salvar alterações";
-        } else {
-            botaoSalvar.textContent = "Salvar alterações";
-        }
-    }
-
+    tituloFormulario.textContent = "Editar tarefa";
+    botaoSalvar.textContent = "Salvar alterações";
     botaoCancelarEdicao.hidden = false;
+
+    mostrarMensagem("Altere os campos e salve as modificações.");
 
     document.querySelector("#cadastro").scrollIntoView({
         behavior: "smooth"
@@ -190,272 +288,300 @@ function iniciarEdicao(tarefa) {
 }
 
 function cancelarEdicao() {
-    identificadorEmEdicao = null;
     formulario.reset();
 
-    if (botaoSalvar) {
-        if (botaoSalvar.tagName === "INPUT") {
-            botaoSalvar.value = textoOriginalBotao;
-        } else {
-            botaoSalvar.textContent = textoOriginalBotao;
-        }
-    }
+    campoIdentificador.value = "";
+    campoStatus.value = "Pendente";
+    campoImportancia.value = "Média";
 
+    tituloFormulario.textContent = "Cadastrar nova tarefa";
+    botaoSalvar.textContent = "Cadastrar tarefa";
     botaoCancelarEdicao.hidden = true;
+
+    mostrarMensagem("");
 }
 
-function excluirTarefa(identificador) {
-    const confirmar = confirm(
-        "Tem certeza de que deseja excluir esta tarefa?"
-    );
+botaoCancelarEdicao.addEventListener("click", cancelarEdicao);
 
-    if (!confirmar) {
+function excluirTarefa(id) {
+    const tarefa = tarefas.find(item => item.id === id);
+
+    if (!tarefa) {
+        mostrarMensagem("Tarefa não encontrada.", "erro");
         return;
     }
 
-    tarefas = tarefas.filter(function (tarefa) {
-        return tarefa.identificador !== identificador;
-    });
+    const confirmou = window.confirm(
+        `Deseja realmente excluir a tarefa "${tarefa.nome}"?`
+    );
 
-    if (identificadorEmEdicao === identificador) {
+    if (!confirmou) {
+        return;
+    }
+
+    const tarefasAnteriores = [...tarefas];
+
+    tarefas = tarefas.filter(item => item.id !== id);
+
+    if (!salvarTarefas()) {
+        tarefas = tarefasAnteriores;
+        return;
+    }
+
+    if (Number(campoIdentificador.value) === id) {
         cancelarEdicao();
     }
 
-    salvarTarefas();
-    renderizarTarefas();
+    conteudoDetalhes.replaceChildren(
+        criarElemento("p", "Nenhuma tarefa selecionada.")
+    );
 
-    alert("Tarefa excluída com sucesso!");
+    renderizarTarefas();
+    mostrarMensagem("Tarefa excluída com sucesso!", "sucesso");
 }
 
-// Pesquisa, filtro e ordenação são aplicados em conjunto.
+function mostrarDetalhes(id) {
+    const tarefa = tarefas.find(item => item.id === id);
+
+    if (!tarefa) {
+        return;
+    }
+
+    conteudoDetalhes.replaceChildren();
+
+    conteudoDetalhes.append(
+        criarElemento("h3", tarefa.nome),
+        criarElemento("p", `Identificador: ${tarefa.id}`),
+        criarElemento("p", `Descrição: ${tarefa.descricao}`),
+        criarElemento("p", `Categoria: ${tarefa.categoria}`),
+        criarElemento("p", `Data de conclusão: ${formatarData(tarefa.dataConclusao)}`),
+        criarElemento("p", `Status: ${tarefa.status}`),
+        criarElemento("p", `Importância: ${tarefa.importancia}`)
+    );
+
+    document.querySelector("#detalhes").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
 function obterTarefasFiltradas() {
-    let resultado = [...tarefas];
+    const pesquisa = campoPesquisa.value.trim().toLocaleLowerCase("pt-BR");
+    const categoria = campoFiltroCategoria.value;
+    const status = campoFiltroStatus.value;
+    const ordenacao = campoOrdenacao.value;
 
-    // Pesquisa pelo nome da tarefa.
-    const pesquisa = campoPesquisa
-        ? campoPesquisa.value.trim().toLowerCase()
-        : "";
+    const resultado = tarefas.filter(tarefa => {
+        const correspondePesquisa =
+            tarefa.nome.toLocaleLowerCase("pt-BR").includes(pesquisa) ||
+            tarefa.descricao.toLocaleLowerCase("pt-BR").includes(pesquisa);
 
-    if (pesquisa) {
-        resultado = resultado.filter(function (tarefa) {
-            return tarefa.nome.toLowerCase().includes(pesquisa);
-        });
-    }
+        const correspondeCategoria =
+            categoria === "" || tarefa.categoria === categoria;
 
-    // Filtro por categoria.
-    const categoriaSelecionada = campoFiltroCategoria
-        ? campoFiltroCategoria.value.toLowerCase()
-        : "";
+        const correspondeStatus =
+            status === "" || tarefa.status === status;
 
-    if (
-        categoriaSelecionada &&
-        !["todas", "todos", "todas-categorias", "todos-categorias", "todas as categorias", "todas_as_categorias"].includes(categoriaSelecionada)
-    ) {
-        resultado = resultado.filter(function (tarefa) {
-            return tarefa.categoria.toLowerCase() === categoriaSelecionada;
-        });
-    }
+        return correspondePesquisa &&
+            correspondeCategoria &&
+            correspondeStatus;
+    });
 
-    // Ordenação.
-    const ordenacao = campoOrdenacao
-        ? campoOrdenacao.value.toLowerCase()
-        : "";
+    const importanciaOrdem = {
+        "Baixa": 1,
+        "Média": 2,
+        "Alta": 3
+    };
 
-    if (ordenacao) {
-        if (ordenacao.includes("nome")) {
-            resultado.sort(function (a, b) {
+    resultado.sort((a, b) => {
+        switch (ordenacao) {
+            case "data-asc":
+                return a.dataConclusao.localeCompare(b.dataConclusao);
+
+            case "data-desc":
+                return b.dataConclusao.localeCompare(a.dataConclusao);
+
+            case "nome-asc":
                 return a.nome.localeCompare(b.nome, "pt-BR");
-            });
-        } else if (
-            ordenacao.includes("data") ||
-            ordenacao.includes("conclusao")
-        ) {
-            resultado.sort(function (a, b) {
-                const dataA = a.dataConclusao || "9999-12-31";
-                const dataB = b.dataConclusao || "9999-12-31";
 
-                return dataA.localeCompare(dataB);
-            });
-        } else if (
-            ordenacao.includes("importancia") ||
-            ordenacao.includes("prioridade")
-        ) {
-            const pesos = {
-                alta: 3,
-                media: 2,
-                baixa: 1
-            };
+            case "nome-desc":
+                return b.nome.localeCompare(a.nome, "pt-BR");
 
-            resultado.sort(function (a, b) {
-                return (pesos[b.importancia] || 0) -
-                    (pesos[a.importancia] || 0);
-            });
-        } else if (
-            ordenacao.includes("identificador") ||
-            ordenacao === "id" ||
-            ordenacao.includes("numero")
-        ) {
-            resultado.sort(function (a, b) {
-                return a.identificador - b.identificador;
-            });
+            case "importancia-asc":
+                return importanciaOrdem[a.importancia] -
+                    importanciaOrdem[b.importancia];
+
+            case "importancia-desc":
+                return importanciaOrdem[b.importancia] -
+                    importanciaOrdem[a.importancia];
+
+            case "id-asc":
+                return a.id - b.id;
+
+            case "id-desc":
+                return b.id - a.id;
+
+            default:
+                return 0;
         }
-    }
-
-    // Reconhece opções de ordenação decrescente.
-    if (
-        ordenacao.includes("desc") ||
-        ordenacao.includes("decrescente") ||
-        ordenacao.includes("maior-menor") ||
-        ordenacao.includes("z-a")
-    ) {
-        resultado.reverse();
-    }
+    });
 
     return resultado;
 }
 
-function renderizarTarefas() {
-    tabelaTarefas.replaceChildren();
+campoPesquisa.addEventListener("input", renderizarTarefas);
+campoFiltroCategoria.addEventListener("change", renderizarTarefas);
+campoFiltroStatus.addEventListener("change", renderizarTarefas);
+campoOrdenacao.addEventListener("change", renderizarTarefas);
 
+function renderizarTarefas() {
     const tarefasExibidas = obterTarefasFiltradas();
 
-    if (tarefasExibidas.length === 0) {
+    listaTarefas.replaceChildren();
+
+    totalTarefas.textContent = tarefas.length;
+    totalPendentes.textContent = tarefas.filter(
+        tarefa => tarefa.status === "Pendente"
+    ).length;
+    totalConcluidas.textContent = tarefas.filter(
+        tarefa => tarefa.status === "Concluída"
+    ).length;
+
+    mensagemLista.hidden = tarefasExibidas.length > 0;
+
+    tarefasExibidas.forEach(tarefa => {
         const linha = document.createElement("tr");
-        const celula = criarCelula("Nenhuma tarefa encontrada.");
-        celula.colSpan = 7;
-        linha.appendChild(celula);
-        tabelaTarefas.appendChild(linha);
-        return;
-    }
 
-    tarefasExibidas.forEach(function (tarefa) {
-        const linha = document.createElement("tr");
-
-        linha.appendChild(criarCelula(tarefa.identificador));
-        linha.appendChild(criarCelula(tarefa.nome));
-        linha.appendChild(criarCelula(formatarCategoria(tarefa.categoria)));
-        linha.appendChild(criarCelula(formatarData(tarefa.dataConclusao)));
-        linha.appendChild(criarCelula(formatarStatus(tarefa.status)));
-        linha.appendChild(criarCelula(formatarImportancia(tarefa.importancia)));
-
-        const celulaAcoes = document.createElement("td");
-
-        const botaoDetalhes = document.createElement("button");
-        botaoDetalhes.type = "button";
-        botaoDetalhes.textContent = "Ver detalhes";
-        botaoDetalhes.addEventListener("click", function () {
-            mostrarDetalhes(tarefa);
-        });
-
-        const botaoEditar = document.createElement("button");
-        botaoEditar.type = "button";
-        botaoEditar.textContent = "Editar";
-        botaoEditar.addEventListener("click", function () {
-            iniciarEdicao(tarefa);
-        });
-
-        const botaoExcluir = document.createElement("button");
-        botaoExcluir.type = "button";
-        botaoExcluir.textContent = "Excluir";
-        botaoExcluir.addEventListener("click", function () {
-            excluirTarefa(tarefa.identificador);
-        });
-
-        celulaAcoes.append(
-            botaoDetalhes,
-            botaoEditar,
-            botaoExcluir
+        const celulaNome = document.createElement("td");
+        celulaNome.append(
+            criarElemento("strong", tarefa.nome),
+            document.createElement("br"),
+            criarElemento("small", tarefa.descricao)
         );
 
-        linha.appendChild(celulaAcoes);
-        tabelaTarefas.appendChild(linha);
+        const celulaCategoria = criarElemento("td", tarefa.categoria);
+        const celulaData = criarElemento("td", formatarData(tarefa.dataConclusao));
+
+        const celulaStatus = document.createElement("td");
+        let classeStatus = "status-pendente";
+
+        if (tarefa.status === "Em andamento") {
+            classeStatus = "status-andamento";
+        } else if (tarefa.status === "Concluída") {
+            classeStatus = "status-concluida";
+        }
+
+        celulaStatus.append(
+            criarElemento("span", tarefa.status, `status ${classeStatus}`)
+        );
+
+        const celulaImportancia = document.createElement("td");
+        const classesImportancia = {
+            "Baixa": "importancia-baixa",
+            "Média": "importancia-media",
+            "Alta": "importancia-alta"
+        };
+
+        celulaImportancia.append(
+            criarElemento(
+                "span",
+                tarefa.importancia,
+                `importancia ${classesImportancia[tarefa.importancia] || ""}`
+            )
+        );
+
+        const celulaAcoes = document.createElement("td");
+        const grupoAcoes = criarElemento("div", undefined, "acoes-tarefa");
+
+        grupoAcoes.append(
+            criarBotao("Detalhes", "botao-detalhes", "detalhes", tarefa.id),
+            criarBotao("Editar", "botao-editar", "editar", tarefa.id),
+            criarBotao("Excluir", "botao-excluir", "excluir", tarefa.id)
+        );
+
+        celulaAcoes.append(grupoAcoes);
+
+        linha.append(
+            celulaNome,
+            celulaCategoria,
+            celulaData,
+            celulaStatus,
+            celulaImportancia,
+            celulaAcoes
+        );
+
+        listaTarefas.append(linha);
     });
 }
 
-function cadastrarTarefa(evento) {
-    evento.preventDefault();
+listaTarefas.addEventListener("click", evento => {
+    const botao = evento.target.closest("button[data-acao]");
 
-    const nome = campoNome.value.trim();
-
-    if (!nome) {
-        alert("Informe o nome da tarefa.");
-        campoNome.focus();
+    if (!botao) {
         return;
     }
 
-    if (
-        !campoCategoria.value ||
-        !campoStatus.value ||
-        !campoImportancia.value
-    ) {
-        alert("Preencha a categoria, o status e a importância.");
+    const id = Number(botao.dataset.id);
+    const acao = botao.dataset.acao;
+
+    if (!Number.isInteger(id)) {
         return;
     }
 
-    if (identificadorEmEdicao !== null) {
-        const indice = tarefas.findIndex(function (tarefa) {
-            return tarefa.identificador === identificadorEmEdicao;
-        });
+    if (acao === "detalhes") {
+        mostrarDetalhes(id);
+    } else if (acao === "editar") {
+        iniciarEdicao(id);
+    } else if (acao === "excluir") {
+        excluirTarefa(id);
+    }
+});
 
-        if (indice !== -1) {
-            tarefas[indice] = {
-                identificador: identificadorEmEdicao,
-                nome: nome,
-                descricao: campoDescricao.value.trim(),
-                categoria: campoCategoria.value,
-                dataConclusao: campoData.value,
-                status: campoStatus.value,
-                importancia: campoImportancia.value
-            };
+const botaoCarregarFrase = document.querySelector("#carregarFrase");
+const textoFrase = document.querySelector("#textoFrase");
+const autorFrase = document.querySelector("#autorFrase");
+const estadoFrase = document.querySelector("#estadoFrase");
+
+async function carregarFraseMotivacional() {
+    botaoCarregarFrase.disabled = true;
+    estadoFrase.textContent = "Carregando frase...";
+    estadoFrase.className = "mensagem";
+
+    try {
+        const resposta = await fetch("https://dummyjson.com/quotes/random");
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível consultar a API.");
         }
 
-        salvarTarefas();
-        cancelarEdicao();
-        renderizarTarefas();
+        const dados = await resposta.json();
 
-        alert("Tarefa atualizada com sucesso!");
-        return;
+        if (
+            typeof dados.quote !== "string" ||
+            typeof dados.author !== "string" ||
+            !dados.quote.trim() ||
+            !dados.author.trim()
+        ) {
+            throw new Error("A API retornou dados inválidos.");
+        }
+
+        textoFrase.textContent = dados.quote;
+        autorFrase.textContent = `— ${dados.author}`;
+        estadoFrase.textContent = "Frase carregada com sucesso!";
+        estadoFrase.classList.add("sucesso");
+    } catch (erro) {
+        console.error("Erro ao carregar frase:", erro);
+
+        textoFrase.textContent =
+            "Não foi possível carregar a frase agora. Tente novamente.";
+
+        autorFrase.textContent = "";
+        estadoFrase.textContent =
+            "Verifique sua conexão com a internet e tente novamente.";
+        estadoFrase.classList.add("erro");
+    } finally {
+        botaoCarregarFrase.disabled = false;
     }
-
-    const proximoIdentificador = tarefas.length > 0
-        ? Math.max(...tarefas.map(function (tarefa) {
-            return tarefa.identificador;
-        })) + 1
-        : 1;
-
-    const novaTarefa = {
-        identificador: proximoIdentificador,
-        nome: nome,
-        descricao: campoDescricao.value.trim(),
-        categoria: campoCategoria.value,
-        dataConclusao: campoData.value,
-        status: campoStatus.value,
-        importancia: campoImportancia.value
-    };
-
-    tarefas.push(novaTarefa);
-
-    salvarTarefas();
-    renderizarTarefas();
-    formulario.reset();
-
-    alert("Tarefa cadastrada com sucesso!");
 }
 
-// Atualiza a tabela sempre que os controles mudarem.
-if (campoPesquisa) {
-    campoPesquisa.addEventListener("input", renderizarTarefas);
-}
-
-if (campoFiltroCategoria) {
-    campoFiltroCategoria.addEventListener("change", renderizarTarefas);
-}
-
-if (campoOrdenacao) {
-    campoOrdenacao.addEventListener("change", renderizarTarefas);
-}
-
-formulario.addEventListener("submit", cadastrarTarefa);
-botaoCancelarEdicao.addEventListener("click", cancelarEdicao);
-
+botaoCarregarFrase.addEventListener("click", carregarFraseMotivacional);
 renderizarTarefas();
