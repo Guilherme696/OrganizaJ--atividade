@@ -9,6 +9,10 @@ const campoData = document.querySelector("#dataConclusao");
 const campoStatus = document.querySelector("#status");
 const campoImportancia = document.querySelector("#importancia");
 
+const campoPesquisa = document.querySelector("#pesquisa");
+const campoFiltroCategoria = document.querySelector("#filtroCategoria");
+const campoOrdenacao = document.querySelector("#ordenacao");
+
 const CHAVE_ARMAZENAMENTO = "organizaJaTarefas";
 
 const tarefasIniciais = [
@@ -44,9 +48,10 @@ const tarefasIniciais = [
 let tarefas = carregarTarefas();
 let identificadorEmEdicao = null;
 
-const botaoSalvar = formulario.querySelector(
-    'button[type="submit"], input[type="submit"]'
-);
+const botaoSalvar =
+    formulario.querySelector('button[type="submit"]') ||
+    formulario.querySelector('input[type="submit"]') ||
+    formulario.querySelector("button:not([type])");
 
 const textoOriginalBotao = botaoSalvar
     ? (botaoSalvar.tagName === "INPUT"
@@ -54,7 +59,6 @@ const textoOriginalBotao = botaoSalvar
         : botaoSalvar.textContent)
     : "Cadastrar tarefa";
 
-// Cria um botão para cancelar a edição.
 const botaoCancelarEdicao = document.createElement("button");
 botaoCancelarEdicao.type = "button";
 botaoCancelarEdicao.textContent = "Cancelar edição";
@@ -131,6 +135,11 @@ function formatarData(data) {
     }
 
     const partes = data.split("-");
+
+    if (partes.length !== 3) {
+        return data;
+    }
+
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
@@ -157,9 +166,9 @@ function iniciarEdicao(tarefa) {
     identificadorEmEdicao = tarefa.identificador;
 
     campoNome.value = tarefa.nome;
-    campoDescricao.value = tarefa.descricao;
+    campoDescricao.value = tarefa.descricao || "";
     campoCategoria.value = tarefa.categoria;
-    campoData.value = tarefa.dataConclusao;
+    campoData.value = tarefa.dataConclusao || "";
     campoStatus.value = tarefa.status;
     campoImportancia.value = tarefa.importancia;
 
@@ -218,10 +227,108 @@ function excluirTarefa(identificador) {
     alert("Tarefa excluída com sucesso!");
 }
 
+// Pesquisa, filtro e ordenação são aplicados em conjunto.
+function obterTarefasFiltradas() {
+    let resultado = [...tarefas];
+
+    // Pesquisa pelo nome da tarefa.
+    const pesquisa = campoPesquisa
+        ? campoPesquisa.value.trim().toLowerCase()
+        : "";
+
+    if (pesquisa) {
+        resultado = resultado.filter(function (tarefa) {
+            return tarefa.nome.toLowerCase().includes(pesquisa);
+        });
+    }
+
+    // Filtro por categoria.
+    const categoriaSelecionada = campoFiltroCategoria
+        ? campoFiltroCategoria.value.toLowerCase()
+        : "";
+
+    if (
+        categoriaSelecionada &&
+        !["todas", "todos", "todas-categorias", "todos-categorias", "todas as categorias", "todas_as_categorias"].includes(categoriaSelecionada)
+    ) {
+        resultado = resultado.filter(function (tarefa) {
+            return tarefa.categoria.toLowerCase() === categoriaSelecionada;
+        });
+    }
+
+    // Ordenação.
+    const ordenacao = campoOrdenacao
+        ? campoOrdenacao.value.toLowerCase()
+        : "";
+
+    if (ordenacao) {
+        if (ordenacao.includes("nome")) {
+            resultado.sort(function (a, b) {
+                return a.nome.localeCompare(b.nome, "pt-BR");
+            });
+        } else if (
+            ordenacao.includes("data") ||
+            ordenacao.includes("conclusao")
+        ) {
+            resultado.sort(function (a, b) {
+                const dataA = a.dataConclusao || "9999-12-31";
+                const dataB = b.dataConclusao || "9999-12-31";
+
+                return dataA.localeCompare(dataB);
+            });
+        } else if (
+            ordenacao.includes("importancia") ||
+            ordenacao.includes("prioridade")
+        ) {
+            const pesos = {
+                alta: 3,
+                media: 2,
+                baixa: 1
+            };
+
+            resultado.sort(function (a, b) {
+                return (pesos[b.importancia] || 0) -
+                    (pesos[a.importancia] || 0);
+            });
+        } else if (
+            ordenacao.includes("identificador") ||
+            ordenacao === "id" ||
+            ordenacao.includes("numero")
+        ) {
+            resultado.sort(function (a, b) {
+                return a.identificador - b.identificador;
+            });
+        }
+    }
+
+    // Reconhece opções de ordenação decrescente.
+    if (
+        ordenacao.includes("desc") ||
+        ordenacao.includes("decrescente") ||
+        ordenacao.includes("maior-menor") ||
+        ordenacao.includes("z-a")
+    ) {
+        resultado.reverse();
+    }
+
+    return resultado;
+}
+
 function renderizarTarefas() {
     tabelaTarefas.replaceChildren();
 
-    tarefas.forEach(function (tarefa) {
+    const tarefasExibidas = obterTarefasFiltradas();
+
+    if (tarefasExibidas.length === 0) {
+        const linha = document.createElement("tr");
+        const celula = criarCelula("Nenhuma tarefa encontrada.");
+        celula.colSpan = 7;
+        linha.appendChild(celula);
+        tabelaTarefas.appendChild(linha);
+        return;
+    }
+
+    tarefasExibidas.forEach(function (tarefa) {
         const linha = document.createElement("tr");
 
         linha.appendChild(criarCelula(tarefa.identificador));
@@ -286,7 +393,6 @@ function cadastrarTarefa(evento) {
     }
 
     if (identificadorEmEdicao !== null) {
-        // Atualiza a tarefa existente sem criar uma duplicata.
         const indice = tarefas.findIndex(function (tarefa) {
             return tarefa.identificador === identificadorEmEdicao;
         });
@@ -311,7 +417,6 @@ function cadastrarTarefa(evento) {
         return;
     }
 
-    // Cadastra uma tarefa nova.
     const proximoIdentificador = tarefas.length > 0
         ? Math.max(...tarefas.map(function (tarefa) {
             return tarefa.identificador;
@@ -335,6 +440,19 @@ function cadastrarTarefa(evento) {
     formulario.reset();
 
     alert("Tarefa cadastrada com sucesso!");
+}
+
+// Atualiza a tabela sempre que os controles mudarem.
+if (campoPesquisa) {
+    campoPesquisa.addEventListener("input", renderizarTarefas);
+}
+
+if (campoFiltroCategoria) {
+    campoFiltroCategoria.addEventListener("change", renderizarTarefas);
+}
+
+if (campoOrdenacao) {
+    campoOrdenacao.addEventListener("change", renderizarTarefas);
 }
 
 formulario.addEventListener("submit", cadastrarTarefa);
